@@ -14,44 +14,30 @@ import Spinner from "../components/Spinner";
 export default function Home() {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  
-  // Ambil juga state 'isLoading' dari authSlice untuk mengetahui kapan proses auth berjalan
-  const { user, token, isLoading: isAuthLoading } = useSelector((state: RootState) => state.auth);
-  const { posts, isLoading: isPostsLoading, currentPage, totalPages } = useSelector((state: RootState) => state.posts);
-  
+  const { user, token } = useSelector((state: RootState) => state.auth);
+  const { posts, isLoading, currentPage, totalPages } = useSelector((state: RootState) => state.posts);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
-  // useEffect yang sudah diperbaiki untuk menangani semua kasus otentikasi
+  // Handle token from URL after Google login
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tokenFromUrl = params.get('token');
-
-    // Prioritas 1: Tangani token baru dari redirect Google
     if (tokenFromUrl) {
       localStorage.setItem('token', tokenFromUrl);
       dispatch(setToken(tokenFromUrl));
       window.history.replaceState({}, document.title, "/");
-      // Komponen akan render ulang dengan token baru, lalu useEffect ini akan berjalan lagi
-      return; 
     }
+  }, [dispatch]);
 
-    // Prioritas 2: Token sudah ada di state, tapi data user belum ada. Lakukan verifikasi.
-    if (token && !user) {
-      // Hanya jalankan checkAuth jika tidak sedang dalam proses loading
-      if (!isAuthLoading) {
-        dispatch(checkAuth());
-      }
-      return;
-    }
-    
-    // Prioritas 3: Tidak ada token sama sekali dan tidak sedang loading. Arahkan ke login.
-    if (!token && !isAuthLoading) {
+  useEffect(() => {
+    if (token) {
+      dispatch(checkAuth());
+    } else {
       navigate("/login");
     }
-  }, [token, user, isAuthLoading, dispatch, navigate]);
+  }, [token, dispatch, navigate]);
 
-  // useEffect ini hanya akan mengambil data post jika user sudah berhasil diverifikasi
   useEffect(() => {
     if (user) {
       dispatch(fetchPosts({ page: 1, limit: 10 }));
@@ -64,9 +50,7 @@ export default function Home() {
     }
   };
 
-  // Tampilkan Spinner jika sedang proses otentikasi ATAU jika data user belum ada.
-  // Ini mencegah redirect prematur ke halaman login.
-  if (isAuthLoading || !user) {
+  if (!user) {
     return <Spinner />;
   }
 
@@ -82,7 +66,7 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Posts Feed */}
           <div className="lg:col-span-2">
-            {isPostsLoading && posts.length === 0 ? (
+            {isLoading && posts.length === 0 ? (
               <div className="flex justify-center py-8">
                 <Spinner />
               </div>
