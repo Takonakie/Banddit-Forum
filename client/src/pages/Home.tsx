@@ -14,29 +14,35 @@ import Spinner from "../components/Spinner";
 export default function Home() {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { user, token } = useSelector((state: RootState) => state.auth);
-  const { posts, isLoading, currentPage, totalPages } = useSelector((state: RootState) => state.posts);
+
+  const { user, token, isLoading: isAuthLoading } = useSelector((state: RootState) => state.auth);
+  const { posts, isLoading: isPostsLoading, currentPage, totalPages } = useSelector((state: RootState) => state.posts);
+  
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
-  // Handle token from URL after Google login
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const tokenFromUrl = params.get('token');
+
     if (tokenFromUrl) {
       localStorage.setItem('token', tokenFromUrl);
       dispatch(setToken(tokenFromUrl));
       window.history.replaceState({}, document.title, "/");
+      return; 
     }
-  }, [dispatch]);
 
-  useEffect(() => {
-    if (token) {
-      dispatch(checkAuth());
-    } else {
+    if (token && !user) {
+      if (!isAuthLoading) {
+        dispatch(checkAuth());
+      }
+      return;
+    }
+    
+    if (!token && !isAuthLoading) {
       navigate("/login");
     }
-  }, [token, dispatch, navigate]);
+  }, [token, user, isAuthLoading, dispatch, navigate]);
 
   useEffect(() => {
     if (user) {
@@ -50,7 +56,7 @@ export default function Home() {
     }
   };
 
-  if (!user) {
+  if (isAuthLoading || !user) {
     return <Spinner />;
   }
 
@@ -66,7 +72,7 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Posts Feed */}
           <div className="lg:col-span-2">
-            {isLoading && posts.length === 0 ? (
+            {isPostsLoading && posts.length === 0 ? (
               <div className="flex justify-center py-8">
                 <Spinner />
               </div>
