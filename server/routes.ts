@@ -229,6 +229,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const validatedData = insertPostSchema.parse({
         ...req.body,
         authorId: req.user.userId,
+        postId: parentComment.postId,
+        parentId: commentId,
       });
 
       const post = await storage.createPost(validatedData);
@@ -355,7 +357,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Fetch the complete reply with author and vote data
       const comments = await storage.getCommentsByPostWithUserVotes(parentComment.postId, userId);
-      const fullReply = comments.find(c => c.id === reply.id);
+      const fullReply = await storage.getComment(reply.id);
       
       res.status(201).json(fullReply || reply);
     } catch (error) {
