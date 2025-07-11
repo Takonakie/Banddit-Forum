@@ -41,7 +41,7 @@ const initialState: PostsState = {
 export const fetchPosts = createAsyncThunk(
   "posts/fetchPosts",
   async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}) => {
-    const response = await apiRequest("GET", `${apiUrl}/api/posts?page=${page}&limit=${limit}`);
+    const response = await apiRequest("GET", `/api/posts?page=${page}&limit=${limit}`);
     return await response.json();
   }
 );
