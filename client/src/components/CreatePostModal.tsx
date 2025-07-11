@@ -35,6 +35,7 @@ export default function CreatePostModal({ isOpen, onClose, editPost }: CreatePos
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+ 
 
   useEffect(() => {
     if (editPost) {

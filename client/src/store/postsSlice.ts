@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { apiRequest } from "../lib/queryClient";
-
+ const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 interface User {
   id: string;
   username: string;
@@ -50,7 +50,7 @@ export const createPost = createAsyncThunk(
   "posts/createPost",
   async (postData: { title: string; content: string }) => {
     const token = localStorage.getItem("token");
-    const response = await fetch("/api/posts", {
+    const response = await fetch(`${apiUrl}/api/posts`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
