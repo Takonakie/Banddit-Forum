@@ -41,7 +41,7 @@ const initialState: PostsState = {
 export const fetchPosts = createAsyncThunk(
   "posts/fetchPosts",
   async ({ page = 1, limit = 10 }: { page?: number; limit?: number } = {}) => {
-    const response = await apiRequest("GET", `/api/posts?page=${page}&limit=${limit}`);
+    const response = await apiRequest("GET", `${apiUrl}/api/posts?page=${page}&limit=${limit}`);
     return await response.json();
   }
 );
@@ -71,7 +71,7 @@ export const updatePost = createAsyncThunk(
   "posts/updatePost",
   async ({ id, ...postData }: { id: string; title: string; content: string }) => {
     const token = localStorage.getItem("token");
-    const response = await fetch(`/api/posts/${id}`, {
+    const response = await fetch(`${apiUrl}/api/posts/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -92,7 +92,7 @@ export const deletePost = createAsyncThunk(
   "posts/deletePost",
   async (id: string) => {
     const token = localStorage.getItem("token");
-    const response = await fetch(`/api/posts/${id}`, {
+    const response = await fetch(`${apiUrl}/api/posts/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -111,7 +111,7 @@ export const votePost = createAsyncThunk(
   "posts/votePost",
   async ({ id, votes, voteType }: { id: string; votes: number; voteType: number }) => {
     const token = localStorage.getItem("token");
-    const response = await fetch(`/api/posts/${id}/vote`, {
+    const response = await fetch(`${apiUrl}/api/posts/${id}/vote`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
