@@ -58,7 +58,7 @@ export const fetchComments = createAsyncThunk(
 
 export const createComment = createAsyncThunk(
   "comments/createComment",
-  async ({ postId, content }: { postId: string; content: string }, { dispatch, rejectWithValue }) => {
+  async ({ postId, content }: { postId: string; content: string }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(`/api/posts/${postId}/comments`, {
@@ -75,7 +75,6 @@ export const createComment = createAsyncThunk(
       }
 
       const comment = await response.json();
-      dispatch(fetchCommentTree(postId)); 
       return { postId, comment };
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : "Unknown error");
@@ -154,7 +153,6 @@ export const createReply = createAsyncThunk(
       }
 
       const reply = await response.json();
-      dispatch(fetchCommentTree(postId));
       return reply;
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : "Unknown error");
@@ -215,7 +213,6 @@ const commentsSlice = createSlice({
     },
     clearComments: (state) => {
       state.comments = {};
-      state.commentTrees = {}; 
       state.error = null;
       state.isLoading = false;
     },
@@ -235,11 +232,11 @@ const commentsSlice = createSlice({
         state.error = action.payload as string;
       })
       .addCase(createComment.fulfilled, (state, action) => {
-        // const { postId, comment } = action.payload;
-        // if (!state.comments[postId]) {
-        //   state.comments[postId] = [];
-        // }
-        // state.comments[postId].unshift(comment);
+        const { postId, comment } = action.payload;
+        if (!state.comments[postId]) {
+          state.comments[postId] = [];
+        }
+        state.comments[postId].unshift(comment);
       })
       .addCase(createComment.rejected, (state, action) => {
         state.error = action.payload as string;
@@ -278,11 +275,11 @@ const commentsSlice = createSlice({
         state.error = action.payload as string;
       })
       .addCase(createReply.fulfilled, (state, action) => {
-        // const reply = action.payload;
-        // // Add reply to flat comments list
-        // if (state.comments[reply.postId]) {
-        //   state.comments[reply.postId].push(reply);
-        // }
+        const reply = action.payload;
+        // Add reply to flat comments list
+        if (state.comments[reply.postId]) {
+          state.comments[reply.postId].push(reply);
+        }
         // Refresh comment tree by re-fetching
       })
       .addCase(createReply.rejected, (state, action) => {

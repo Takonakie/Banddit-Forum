@@ -97,7 +97,7 @@ export default function CommentSection({ postId, user }: CommentSectionProps) {
   
   const handleSubmitReply = async (parentId: string) => {
     if (!replyText.trim()) return;
-    await dispatch(createReply({ parentCommentId: parentId, content: replyText, postId }));
+    await dispatch(createReply({ parentCommentId: parentId, content: replyText }));
     dispatch(fetchCommentTree(postId));
     setReplyingTo(null);
     setReplyText("");
