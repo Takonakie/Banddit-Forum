@@ -8,7 +8,6 @@ import { ArrowUp, ArrowDown, MessageCircle, Share, Bookmark, Edit, Trash2 } from
 import CreatePostModal from "./CreatePostModal";
 import CommentSection from "./CommentSection";
 
-
 interface User {
   id: string;
   username: string;

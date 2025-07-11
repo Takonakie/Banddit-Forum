@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { apiRequest } from "../lib/queryClient";
- const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 interface User {
   id: string;
   username: string;
@@ -50,7 +50,7 @@ export const createPost = createAsyncThunk(
   "posts/createPost",
   async (postData: { title: string; content: string }) => {
     const token = localStorage.getItem("token");
-    const response = await fetch(`${apiUrl}/api/posts`, {
+    const response = await fetch("/api/posts", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -71,7 +71,7 @@ export const updatePost = createAsyncThunk(
   "posts/updatePost",
   async ({ id, ...postData }: { id: string; title: string; content: string }) => {
     const token = localStorage.getItem("token");
-    const response = await fetch(`${apiUrl}/api/posts/${id}`, {
+    const response = await fetch(`/api/posts/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -92,7 +92,7 @@ export const deletePost = createAsyncThunk(
   "posts/deletePost",
   async (id: string) => {
     const token = localStorage.getItem("token");
-    const response = await fetch(`${apiUrl}/api/posts/${id}`, {
+    const response = await fetch(`/api/posts/${id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -111,7 +111,7 @@ export const votePost = createAsyncThunk(
   "posts/votePost",
   async ({ id, votes, voteType }: { id: string; votes: number; voteType: number }) => {
     const token = localStorage.getItem("token");
-    const response = await fetch(`${apiUrl}/api/posts/${id}/vote`, {
+    const response = await fetch(`/api/posts/${id}/vote`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
